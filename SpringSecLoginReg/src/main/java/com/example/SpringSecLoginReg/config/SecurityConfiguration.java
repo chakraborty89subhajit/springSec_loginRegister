@@ -19,7 +19,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final UserService userService;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public SecurityConfiguration(UserService userService, BCryptPasswordEncoder passwordEncoder) {
+    public SecurityConfiguration(UserService userService,
+                                 BCryptPasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
     }
@@ -29,15 +30,18 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests()
                 .antMatchers(
-                        "/registration**",   // match both GET and POST
+                        "/registration**",
                         "/js/**",
                         "/css/**",
                         "/img/**"
-                ).permitAll()           // allow anyone
-                .anyRequest().authenticated()  // all other requests need login
+                ).permitAll()
+                .antMatchers("/admin/**").hasRole("ADMIN")
+                .antMatchers("/user/**").hasRole("USER")
+                .anyRequest().authenticated()
                 .and()
                 .formLogin()
                 .loginPage("/login")
+                .defaultSuccessUrl("/default", true) // 👈 redirect here after login
                 .permitAll()
                 .and()
                 .logout()
@@ -47,8 +51,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .logoutSuccessUrl("/login?logout")
                 .permitAll()
                 .and()
-                .csrf().disable();  // disable temporarily to allow POST registration without CSRF token
+                .csrf().disable();
     }
+
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {

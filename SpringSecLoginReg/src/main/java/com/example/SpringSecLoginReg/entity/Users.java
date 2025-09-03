@@ -44,6 +44,7 @@ public class Users {
         this.role = role;
     }
 
+
     public Users(String first_name, String last_name, String email, String password, Collection<Role> role) {
         this.first_name = first_name;
         this.last_name = last_name;
